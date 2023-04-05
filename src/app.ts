@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import notesRoutes from "./routes/notes";
 import usersRoutes from "./routes/users";
 import morgan from "morgan";
-import createHttpError, {isHttpError} from "http-errors";
+import createHttpError, { isHttpError } from "http-errors";
 import session from "express-session";
 import env from './util/validateEnv';
 import MongoStore from "connect-mongo";
@@ -32,26 +32,27 @@ app.use(session({
 app.use("/api/users", usersRoutes);
 app.use("/api/notes", requireAuth, notesRoutes);
 
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static("frontend/build"));
+
+    app.get("/*", (req: Request, res: Response) => {
+        res.sendFile(
+            path.resolve(__dirname, "..", "frontend", "build", "index.html")
+        );
+    });
+}
+
 app.use((req, res, next) => {
     next(createHttpError(404, "Endpoint not found"));
 });
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static("frontend/build"));
-  
-    app.get("/*", (req: Request, res: Response) => {
-      res.sendFile(
-        path.resolve(__dirname, "frontend", "build", "index.html")
-      );
-    });
-  }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
     console.error(error);
     let errorMessage = "Error occured";
     let statusCode = 500;
-    if (isHttpError(error)){
+    if (isHttpError(error)) {
         statusCode = error.status;
         errorMessage = error.message;
     }
