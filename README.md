@@ -1,6 +1,6 @@
 # mern-note-app
 
-MongoDB Express React NodeJS Note-Taking Aplication
+MongoDB Express React NodeJS Note-Taking Application
 
 ### npm run dev
 
